@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, Plus, Filter, Search, ArrowUpDown, X, Clock, Mail, User, AlertCircle } from 'lucide-react';
+import { Package, Plus, Filter, Search, ArrowUpDown, X, Clock, Mail, User, AlertCircle, MapPin, Shield } from 'lucide-react';
 
 const mockResources = [
   {
@@ -176,61 +176,91 @@ export function Resources() {
 
       {/* Resource Details Modal */}
       {isModalOpen && selectedResource && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">{selectedResource.name}</h3>
+        <div 
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm overflow-y-auto h-full w-full z-50"
+          onClick={handleCloseModal}
+        >
+          <div 
+            className="relative top-10 mx-auto p-6 border w-[500px] shadow-2xl rounded-xl bg-white/95 backdrop-blur-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">{selectedResource.name}</h3>
+                <p className="text-sm text-gray-500 mt-1">{selectedResource.category}</p>
+              </div>
               <button
                 onClick={handleCloseModal}
-                className="text-gray-400 hover:text-gray-500"
+                className="text-gray-400 hover:text-gray-500 transition-colors"
               >
-                <X className="h-5 w-5" />
+                <X className="h-6 w-6" />
               </button>
             </div>
             
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Package className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-600">Category: {selectedResource.category}</span>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <AlertCircle className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-600">Urgency: {selectedResource.urgency}</span>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Package className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-600">Quantity: {selectedResource.quantity} {selectedResource.unit}</span>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <MapPin className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-600">Location: {selectedResource.location}</span>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Clock className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-600">Added: {new Date(selectedResource.timestamp).toLocaleString()}</span>
-              </div>
-              
-              <div className="pt-2">
-                <p className="text-sm text-gray-600">{selectedResource.description}</p>
-              </div>
-              
-              <div className="border-t pt-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Provided By</h4>
-                <div className="flex items-center space-x-2">
-                  <User className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm text-gray-600">{selectedResource.providedBy.name}</span>
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                  <AlertCircle className="h-5 w-5 text-red-400" />
+                  <div>
+                    <p className="text-xs text-gray-500">Urgency</p>
+                    <p className="text-sm font-medium text-gray-900 capitalize">{selectedResource.urgency}</p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2 mt-1">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm text-gray-600">{selectedResource.providedBy.email}</span>
+                
+                <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                  <Package className="h-5 w-5 text-blue-400" />
+                  <div>
+                    <p className="text-xs text-gray-500">Quantity</p>
+                    <p className="text-sm font-medium text-gray-900">{selectedResource.quantity} {selectedResource.unit}</p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2 mt-1">
-                  <Shield className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm text-gray-600">Role: {selectedResource.providedBy.role}</span>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                <MapPin className="h-5 w-5 text-green-400" />
+                <div>
+                  <p className="text-xs text-gray-500">Location</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedResource.location}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                <Clock className="h-5 w-5 text-purple-400" />
+                <div>
+                  <p className="text-xs text-gray-500">Added</p>
+                  <p className="text-sm font-medium text-gray-900">{new Date(selectedResource.timestamp).toLocaleString()}</p>
+                </div>
+              </div>
+              
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-xs text-gray-500 mb-1">Description</p>
+                <p className="text-sm text-gray-900">{selectedResource.description}</p>
+              </div>
+              
+              <div className="border-t pt-5">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Provided By</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                    <User className="h-5 w-5 text-indigo-400" />
+                    <div>
+                      <p className="text-xs text-gray-500">Name</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedResource.providedBy.name}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                    <Mail className="h-5 w-5 text-orange-400" />
+                    <div>
+                      <p className="text-xs text-gray-500">Email</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedResource.providedBy.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                    <Shield className="h-5 w-5 text-teal-400" />
+                    <div>
+                      <p className="text-xs text-gray-500">Role</p>
+                      <p className="text-sm font-medium text-gray-900 capitalize">{selectedResource.providedBy.role}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -240,5 +270,4 @@ export function Resources() {
     </div>
   );
 }
-
 export default Resources;
