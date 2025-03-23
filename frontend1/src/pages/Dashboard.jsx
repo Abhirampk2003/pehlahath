@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
-import { AlertTriangle, Users, MessageSquare, Bell } from 'lucide-react';
+import { AlertTriangle, Users, MessageSquare, Bell, Phone, Shield, LogOut, ChevronRight, Activity } from 'lucide-react';
 import axios from 'axios';
 import { Sidebar } from '../components/Sidebar';
+import { useThemeStore } from '../store/theme';
+import { backendService } from '../services/backendService';
+import toast from 'react-hot-toast';
 
 const BACKEND_URL = "http://localhost:5000/api/auth/dashboard";
 const ALERTS_URL = "http://localhost:5000/api/auth/reports";
@@ -169,7 +172,9 @@ const EmergencyMap = React.memo(({ selectedIncident, setSelectedIncident, locati
             <h3 className="font-semibold text-gray-900">{selectedIncident.title}</h3>
             <p className="text-sm text-gray-600 mt-1">{selectedIncident.description}</p>
             <div className="mt-2">
-              <span className="text-xs font-medium text-gray-500">Severity: {selectedIncident.severity}</span>
+              <span className="text-xs font-medium text-gray-500">
+                Severity: {selectedIncident.severity}
+              </span>
             </div>
           </div>
         </InfoWindow>
@@ -178,11 +183,17 @@ const EmergencyMap = React.memo(({ selectedIncident, setSelectedIncident, locati
   );
 });
 
-
 export function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  
+  const { isDarkMode } = useThemeStore();
+  const [stats, setStats] = useState({
+    activeDisasters: 0,
+    totalVolunteers: 0,
+    emergencyContacts: 0,
+    resourceRequests: 0
+  });
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: VITE_GOOGLE_MAPS_API_KEY
@@ -260,152 +271,235 @@ export function Dashboard() {
     }
   }, [location]);
 
+  useEffect(() => {
+    loadDashboardStats();
+  }, []);
+
+  const loadDashboardStats = async () => {
+    try {
+      const data = await backendService.getDashboardStats();
+      setStats(data);
+    } catch (error) {
+      console.error('Error loading dashboard stats:', error);
+      toast.error('Failed to load dashboard statistics');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast.error('Failed to logout');
+    }
+  };
+
+  const menuItems = [
+    {
+      title: 'Report Disaster',
+      description: 'Report a new disaster or emergency situation',
+      icon: AlertTriangle,
+      path: '/report-disaster',
+      color: 'text-red-500'
+    },
+    {
+      title: 'Emergency Contacts',
+      description: 'Manage emergency contact information',
+      icon: Phone,
+      path: '/emergency-contacts',
+      color: 'text-blue-500'
+    },
+    {
+      title: 'Resources',
+      description: 'View and manage available resources',
+      icon: Shield,
+      path: '/resources',
+      color: 'text-green-500'
+    },
+    {
+      title: 'Alerts',
+      description: 'View and manage emergency alerts',
+      icon: Bell,
+      path: '/alerts',
+      color: 'text-yellow-500'
+    },
+    {
+      title: 'Volunteers',
+      description: 'View and manage volunteer information',
+      icon: Users,
+      path: '/volunteers',
+      color: 'text-purple-500'
+    },
+    {
+      title: 'Settings',
+      description: 'Manage your account settings',
+      icon: ChevronRight,
+      path: '/settings',
+      color: 'text-gray-500'
+    }
+  ];
+
   return (
-    <div className="h-full flex">
-      <Sidebar isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} />
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
+      {/* Header */}
+      <header className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <Shield className={`h-8 w-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`} />
+              <h1 className={`ml-2 text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                Disaster Management System
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                Welcome, {user?.name}
+              </span>
+              <button
+                onClick={handleLogout}
+                className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md ${
+                  isDarkMode 
+                    ? 'text-gray-300 hover:text-white hover:bg-gray-700' 
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
 
       {/* Main Content */}
-      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-16'}`}>
-        <div className="grid grid-cols-12 gap-6 h-full p-6">
-          {/* Left Column - Stats and Alerts */}
-          <div className="col-span-12 lg:col-span-3 space-y-6">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-lg p-6 text-white">
-              <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Emergency Hub</h1>
-                <AlertTriangle className="h-8 w-8" />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className={`p-6 rounded-lg shadow-sm ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-red-100">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
               </div>
-              <p className="mt-2 text-blue-100">Emergency Response Command Center</p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Active Incidents</p>
-                    <h3 className="text-2xl font-bold text-gray-900">15</h3>
-                  </div>
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <AlertTriangle className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Response Teams</p>
-                    <h3 className="text-2xl font-bold text-gray-900">42</h3>
-                  </div>
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <Users className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Open Requests</p>
-                    <h3 className="text-2xl font-bold text-gray-900">23</h3>
-                  </div>
-                  <div className="bg-green-100 p-3 rounded-full">
-                    <MessageSquare className="h-6 w-6 text-green-600" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">Recent Alerts</h2>
-                  <Link to="/alerts" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                    View All
-                  </Link>
-                </div>
-              </div>
-              <div className="p-4 space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-start space-x-3">
-                    <div className="bg-blue-100 p-2 rounded-full">
-                      <Bell className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-900">Emergency Alert</h3>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Emergency response teams dispatched...
-                      </p>
-                      <span className="text-xs text-gray-400 mt-1 block">1 hour ago</span>
-                    </div>
-                  </div>
-                ))}
+              <div className="ml-4">
+                <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Active Disasters
+                </p>
+                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {stats.activeDisasters}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Map and Resources */}
-          <div className="col-span-12 lg:col-span-9 space-y-6">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">Emergency Incident Map</h2>
-                  <button onClick={handleClick} className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700">
-                    <AlertTriangle className="h-4 w-4 mr-2" />
-                    Report Incident
-                  </button>
-                </div>
+          <div className={`p-6 rounded-lg shadow-sm ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-blue-100">
+                <Users className="h-6 w-6 text-blue-600" />
               </div>
-              <div className="h-[600px] relative">
-                {isLoaded ? (
-                  <EmergencyMap
-                    selectedIncident={selectedIncident}
-                    setSelectedIncident={setSelectedIncident}
-                    location={location}
-                    alerts={alerts} // Add this line
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-gray-500">Loading map...</div>
-                  </div>
-                )}
+              <div className="ml-4">
+                <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Total Volunteers
+                </p>
+                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {stats.totalVolunteers}
+                </p>
               </div>
             </div>
+          </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Resource Status</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600">Emergency Vehicles</span>
-                    <span className="font-medium text-gray-900">8/10 Available</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-green-500 rounded-full" style={{ width: '80%' }} />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600">Medical Supplies</span>
-                    <span className="font-medium text-gray-900">65% Remaining</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-yellow-500 rounded-full" style={{ width: '65%' }} />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600">Response Teams</span>
-                    <span className="font-medium text-gray-900">12/15 Active</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: '75%' }} />
-                  </div>
-                </div>
+          <div className={`p-6 rounded-lg shadow-sm ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-green-100">
+                <Phone className="h-6 w-6 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Emergency Contacts
+                </p>
+                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {stats.emergencyContacts}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={`p-6 rounded-lg shadow-sm ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-yellow-100">
+                <Shield className="h-6 w-6 text-yellow-600" />
+              </div>
+              <div className="ml-4">
+                <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Resource Requests
+                </p>
+                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {stats.resourceRequests}
+                </p>
               </div>
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Quick Actions */}
+        <div className={`rounded-lg shadow-sm ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className="p-6">
+            <h2 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              Quick Actions
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {menuItems.map((item) => (
+                <button
+                  key={item.title}
+                  onClick={() => navigate(item.path)}
+                  className={`flex items-center justify-between p-4 rounded-lg border ${
+                    isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' 
+                      : 'bg-white border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <div className={`p-2 rounded-lg ${item.color.replace('text-', 'bg-')} bg-opacity-10`}>
+                      <item.icon className={`h-5 w-5 ${item.color}`} />
+                    </div>
+                    <div className="ml-4 text-left">
+                      <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {item.title}
+                      </p>
+                      <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className={`h-5 w-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className={`mt-8 rounded-lg shadow-sm ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className="p-6">
+            <h2 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              Recent Activity
+            </h2>
+            <div className="space-y-4">
+              {/* Activity items would go here */}
+              <div className={`flex items-center p-4 rounded-lg ${
+                isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+              }`}>
+                <Activity className={`h-5 w-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                <p className={`ml-3 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  No recent activity to display
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
+
+export default Dashboard;

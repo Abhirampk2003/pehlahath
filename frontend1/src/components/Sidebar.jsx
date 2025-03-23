@@ -2,9 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, MessageSquare, Phone, AlertCircle, Box, Settings, Heart, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthProvider';
+import { useThemeStore } from '../store/theme';
 
 export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
   const { logout } = useAuth();
+  const { isDarkMode } = useThemeStore();
 
   const sidebarItems = [
     { icon: <Box size={20} />, label: 'Dashboard', path: '/' },
@@ -18,15 +20,16 @@ export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
   ];
 
   return (
-    <div className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-all duration-300 z-50 
-      ${isSidebarOpen ? 'w-64' : 'w-18'}`}>
-      <div className="p-4 flex items-center justify-between border-b">
-        {isSidebarOpen && <h2 className="text-xl font-bold text-gray-800">PehlaHath</h2>}
+    <div className={`fixed top-0 left-0 h-full shadow-lg transition-all duration-300 z-50 
+      ${isSidebarOpen ? 'w-64' : 'w-18'}
+      ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <div className={`p-4 flex items-center justify-between border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+        {isSidebarOpen && <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>PehlaHath</h2>}
         <button
           onClick={() => setSidebarOpen(!isSidebarOpen)}
-          className="p-2 hover:bg-gray-100 rounded-lg"
+          className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
         >
-          {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          {isSidebarOpen ? <X size={20} className={isDarkMode ? 'text-white' : 'text-gray-800'} /> : <Menu size={20} className={isDarkMode ? 'text-white' : 'text-gray-800'} />}
         </button>
       </div>
       
@@ -37,7 +40,7 @@ export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
               key={index}
               to={item.path}
               className={`flex items-center ${isSidebarOpen ? 'space-x-3' : 'justify-center'} 
-                p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 mb-2`}
+                p-3 rounded-lg ${isDarkMode ? 'hover:bg-gray-700 text-gray-300 hover:text-white' : 'hover:bg-blue-50 text-gray-700 hover:text-blue-600'} mb-2`}
             >
               {item.icon}
               {isSidebarOpen && <span>{item.label}</span>}
@@ -48,7 +51,7 @@ export function Sidebar({ isSidebarOpen, setSidebarOpen }) {
         <button
           onClick={logout}
           className={`flex items-center ${isSidebarOpen ? 'space-x-3' : 'justify-center'} 
-            p-3 rounded-lg hover:bg-red-50 text-red-600 hover:text-red-700`}
+            p-3 rounded-lg ${isDarkMode ? 'hover:bg-gray-700 text-red-400 hover:text-red-300' : 'hover:bg-red-50 text-red-600 hover:text-red-700'}`}
         >
           <LogOut size={20} />
           {isSidebarOpen && <span>Sign Out</span>}
