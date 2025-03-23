@@ -12,10 +12,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check localStorage for token on page refresh
     const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('userData');
 
-    if (token) {
+    if (token && userData) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      setUser({ token }); // Simulated user object
+      setUser(JSON.parse(userData));
     }
   }, []);
 
@@ -23,19 +24,20 @@ export const AuthProvider = ({ children }) => {
     console.log("Updated user state:", user);
   }, [user]);
 
-  const login = (token) => {
-    console.log(token)
+  const login = (token, userData) => {
     localStorage.setItem('token', token);
+    localStorage.setItem('userData', JSON.stringify(userData));
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    setUser({ token });
-    navigate('/'); // Redirect after login
+    setUser(userData);
+    navigate('/');
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('userData');
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
-    navigate('/login'); // Redirect after logout
+    navigate('/login');
   };
 
   return (

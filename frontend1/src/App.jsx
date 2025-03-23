@@ -19,18 +19,18 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
-      <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
-      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       <Route path="/register" element={<Register/>}/>
       <Route element={<Layout />}>
-      <Route path="/alerts" element={<Alerts/>}/>
-      <Route path="/chat" element={<Chat/>}/>
-      <Route path="/emergency-contacts" element={<EmergencyContacts/>}/>
-      <Route path="/report-disaster" element={<ReportDisaster/>}/>
-      <Route path="/resources" element={<Resources/>}/>
-      <Route path="/settings" element={<Settings/>}/>
-      <Route path="/volunteers" element={<Volunteers/>}/>
+        <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/alerts" element={<Alerts/>}/>
+        <Route path="/chat" element={<Chat/>}/>
+        <Route path="/emergency-contacts" element={<EmergencyContacts/>}/>
+        <Route path="/report-disaster" element={<ReportDisaster/>}/>
+        <Route path="/resources" element={<Resources/>}/>
+        <Route path="/settings" element={<Settings/>}/>
+        <Route path="/volunteers" element={<Volunteers/>}/>
       </Route>
+      <Route path="*" element={<Navigate to={user ? "/" : "/login"} />} />
     </Routes>
   );
 }

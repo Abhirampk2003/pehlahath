@@ -22,15 +22,13 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Compare passwords
+    // Compare passwords using bcrypt
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     // Generate JWT Token
-    console.log('JWT_SECRET:', JWT_SECRET);
-
     const token = jwt.sign(
       { 
         id: user._id, 
@@ -42,9 +40,17 @@ export const loginUser = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.json({ token, message: 'Login successful' });
+    // Return user data along with token
+    res.json({
+      token,
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      message: 'Login successful'
+    });
   } catch (err) {
-    console.error(err);
+    console.error('Login error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };

@@ -25,7 +25,13 @@ export function Login() {
       console.log('Login response:', response.data);
       
       if (response.data && response.data.token) {
-        login(response.data.token);
+        const userData = {
+          id: response.data.id,
+          email: response.data.email,
+          name: response.data.name,
+          role: response.data.role
+        };
+        login(response.data.token, userData);
         toast.success('Welcome back!');
       } else {
         console.error('Invalid response format:', response.data);
