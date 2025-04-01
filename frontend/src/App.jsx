@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthProvider';
 import { useThemeStore } from './store/theme';
@@ -16,6 +16,8 @@ import { Layout } from './components/Layout';
 import { Toaster } from 'react-hot-toast';
 import { Profile } from './pages/Profile';
 import { DamWaterLevels } from './pages/DamWaterLevels';
+import { initDB } from './utils/indexedDB';
+import { toast } from 'react-hot-toast';
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -35,6 +37,23 @@ function App() {
   const { isDarkMode } = useThemeStore();
   const navigate = useNavigate();
   const location = useLocation();
+  const [, setIsDBInitialized] = useState(false);
+
+  // Initialize IndexedDB
+  useEffect(() => {
+    const setupIndexedDB = async () => {
+      try {
+        await initDB();
+        setIsDBInitialized(true);
+        console.log('IndexedDB initialized successfully');
+      } catch (error) {
+        console.error('Failed to initialize IndexedDB:', error);
+        toast.error('Failed to initialize offline storage');
+      }
+    };
+
+    setupIndexedDB();
+  }, []);
 
   // Update document class when theme changes
   useEffect(() => {
@@ -44,6 +63,20 @@ function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [isDarkMode]);
+
+  // Listen for online/offline events
+  useEffect(() => {
+    const handleOnline = () => toast.success('You are back online!');
+    const handleOffline = () => toast.error('You are offline. Some features may be limited.');
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Listen for auth state changes and redirect if needed
   useEffect(() => {

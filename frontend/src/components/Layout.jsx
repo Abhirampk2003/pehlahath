@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
+import { OfflineIndicator } from './OfflineIndicator';
 import { useThemeStore } from '../store/theme';
 import { Home, Bell, MessageSquare, Phone, AlertCircle, Box, Settings, Heart } from 'lucide-react';
 
@@ -114,6 +115,9 @@ export function Layout() {
           </div>
         </main>
       </div>
+      
+      {/* Offline Indicator */}
+      <OfflineIndicator />
     </div>
   );
 }
