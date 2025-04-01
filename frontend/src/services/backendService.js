@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { addPendingRequest, getAllData, updateData, STORES, updatePendingRequestStatus, clearCompletedRequests } from '../utils/indexedDB';
 
-const API_BASE_URL = 'http://localhost:5000/api'; // Update this with your backend URL
+const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/api`; // Update this with your backend URL
 
 // Check if the device is online
 const isOnline = () => navigator.onLine;

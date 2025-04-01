@@ -13,7 +13,7 @@ import { CreateTaskModal } from "../components/CreateTaskModal";
 import { TaskDetailsModal } from "../components/TaskDetailsModal";
 import { useThemeStore } from '../store/theme';
 
-const BACKEND_URL = "http://localhost:5000/api/volunteers";
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}/api/volunteers`;
 
 export function Volunteers() {
   const { user } = useAuth();

@@ -15,10 +15,12 @@ import { Sidebar } from "../components/Sidebar";
 import { GOOGLE_MAPS_CONFIG } from "../utils/googleMapsConfig";
 import { useThemeStore } from "../store/theme";
 
-const BACKEND_URL = "http://localhost:5000/api/auth/dashboard";
-const ALERTS_URL = "http://localhost:5000/api/auth/reports";
-const VOLUNTEERS_URL = "http://localhost:5000/api/volunteers";
-const RESOURCES_URL = "http://localhost:5000/api/resources";
+const URL = import.meta.env.VITE_BACKEND_URL;
+
+const BACKEND_URL = `${URL}/api/auth/dashboard`;
+const ALERTS_URL = `${URL}/api/auth/reports`;
+const VOLUNTEERS_URL = `${URL}/api/volunteers`;
+const RESOURCES_URL = `${URL}/api/resources`;
 
 const getRelativeTime = (timestamp) => {
   const now = new Date();

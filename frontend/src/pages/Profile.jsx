@@ -5,7 +5,7 @@ import { User, Mail, Shield, Save, X, Phone } from "lucide-react";
 import { useThemeStore } from "../store/theme";
 import axios from "axios";
 
-const BACKEND_URL = "http://localhost:5000/api/auth";
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}/api/auth`;
 
 export function Profile() {
   const { user, updateUserInfo } = useAuth();

@@ -6,7 +6,7 @@ import { useJsApiLoader } from "@react-google-maps/api";
 import { GOOGLE_MAPS_CONFIG } from '../utils/googleMapsConfig';
 import { useThemeStore } from '../store/theme';
 
-const BACKEND_URL = "http://localhost:5000/api/auth/reports";
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}/api/auth/reports`;
 const VITE_GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export function ReportDisaster() {

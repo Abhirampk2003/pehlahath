@@ -7,8 +7,8 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current directory.
   // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
-  const env = loadEnv(mode, import.meta.url, '');
-  
+  const env = loadEnv(mode, import.meta.url, "");
+
   return {
     plugins: [
       tailwindcss(),
@@ -43,9 +43,9 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
-          globDirectory: 'dist',
-          globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-          swDest: 'dist/sw.js',
+          globDirectory: "dist",
+          globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+          swDest: "dist/sw.js",
         },
       }),
     ],
@@ -53,14 +53,14 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       proxy: {
         "/api": {
-          target: "http://localhost:5000",
+          target: env.VITE_BACKEND_URL || "http://localhost:5000",
           changeOrigin: true,
         },
       },
       hmr: {
         // Explicitly set the HMR protocol, host, and port
-        protocol: 'ws',
-        host: 'localhost',
+        protocol: "ws",
+        host: "localhost",
         port: 3000,
         // Add this to fix potential CORS issues
         clientPort: 3000,
@@ -70,7 +70,11 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       "process.env": {
-        VITE_GOOGLE_MAPS_API_KEY: JSON.stringify(env.VITE_GOOGLE_MAPS_API_KEY || ""),
+        VITE_GOOGLE_MAPS_API_KEY: JSON.stringify(
+          env.VITE_GOOGLE_MAPS_API_KEY || ""
+        ),
+        VITE_GEMINI_API_KEY: JSON.stringify(env.VITE_GEMINI_API_KEY || ""),
+        VITE_BACKEND_URL: JSON.stringify(env.VITE_BACKEND_URL || ""),
       },
     },
     optimizeDeps: {
