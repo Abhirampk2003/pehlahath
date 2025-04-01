@@ -22,7 +22,7 @@ export function DamWaterLevels() {
 
   const fetchDamData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/dams/dam-levels');
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/dams/dam-levels`);
       if (response.data && response.data.dams) {
         setDams(response.data.dams);
         console.log('Dam data loaded:', response.data.dams);

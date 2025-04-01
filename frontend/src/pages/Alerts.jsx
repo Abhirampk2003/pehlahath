@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthProvider";
 import { Bell, AlertTriangle, Filter, Search, MapPin, Calendar, ExternalLink, Image as ImageIcon, X } from 'lucide-react';
 import { useThemeStore } from '../store/theme';
 
-const BACKEND_URL = "http://localhost:5000/api/auth/reports";
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}/api/auth/reports`;
 
 export function Alerts() {
   const { isDarkMode } = useThemeStore();

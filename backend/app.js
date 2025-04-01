@@ -12,7 +12,9 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['https://pehlahath-frontend.onrender.com','http://localhost:3000']
+}));
 app.use(express.json());
 
 // Use Consolidated Routes

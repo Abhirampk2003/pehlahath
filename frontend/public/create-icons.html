@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create PWA Icons</title>
+</head>
+<body>
+  <canvas id="icon192" width="192" height="192"></canvas>
+  <canvas id="icon512" width="512" height="512"></canvas>
+  
+  <script>
+    // Create 192x192 icon
+    const canvas192 = document.getElementById('icon192');
+    const ctx192 = canvas192.getContext('2d');
+    ctx192.fillStyle = '#e53e3e'; // Red color matching your theme
+    ctx192.fillRect(0, 0, 192, 192);
+    
+    // Add text
+    ctx192.fillStyle = 'white';
+    ctx192.font = 'bold 40px Arial';
+    ctx192.textAlign = 'center';
+    ctx192.textBaseline = 'middle';
+    ctx192.fillText('PH', 96, 96);
+    
+    // Create link to download
+    const link192 = document.createElement('a');
+    link192.download = 'pwa-192x192.png';
+    link192.href = canvas192.toDataURL('image/png');
+    link192.textContent = 'Download 192x192 Icon';
+    document.body.appendChild(link192);
+    document.body.appendChild(document.createElement('br'));
+    
+    // Create 512x512 icon
+    const canvas512 = document.getElementById('icon512');
+    const ctx512 = canvas512.getContext('2d');
+    ctx512.fillStyle = '#e53e3e'; // Red color matching your theme
+    ctx512.fillRect(0, 0, 512, 512);
+    
+    // Add text
+    ctx512.fillStyle = 'white';
+    ctx512.font = 'bold 120px Arial';
+    ctx512.textAlign = 'center';
+    ctx512.textBaseline = 'middle';
+    ctx512.fillText('PH', 256, 256);
+    
+    // Create link to download
+    const link512 = document.createElement('a');
+    link512.download = 'pwa-512x512.png';
+    link512.href = canvas512.toDataURL('image/png');
+    link512.textContent = 'Download 512x512 Icon';
+    document.body.appendChild(link512);
+  </script>
+</body>
+</html>

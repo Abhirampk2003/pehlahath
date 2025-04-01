@@ -4,7 +4,7 @@ import { AlertTriangle } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-const BACKEND_URL = "http://localhost:5000/api/auth";
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}/api/auth`;
 
 export function Register() {
   const navigate = useNavigate();
